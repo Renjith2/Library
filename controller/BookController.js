@@ -1,6 +1,6 @@
 
 const crypto = require('crypto');
-const storage=require('../')
+const storage =require('../databaseConfig/databaseConfig')
 const Book = require('../models/BookSchema');
 const User = require('../models/UserSchema');
 const moment = require('moment');
