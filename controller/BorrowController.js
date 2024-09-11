@@ -9,6 +9,18 @@ const borrowBookFromLibrary = async (req, res) => {
         const { libraryName, bookTitle, price } = req.body;
         const userId = req.userId; // User's ID stored in the request from middleware
 
+              // Validation for missing required fields
+              if (!libraryName || !bookTitle || !price) {
+                return res.status(400).json({
+                    success: false,
+                    message: {
+                        en: `Missing required fields: ${!libraryName ? 'libraryName' : ''} ${!bookTitle ? 'bookTitle' : ''} ${!price ? 'price' : ''}`.trim(),
+                        hi: `आवश्यक फ़ील्ड गायब हैं: ${!libraryName ? 'लाइब्रेरी का नाम' : ''} ${!bookTitle ? 'पुस्तक का शीर्षक' : ''} ${!price ? 'कीमत' : ''}`.trim()
+                    }[language]
+                });
+            }
+    
+
         // Find the user by ID to get the borrower's name
         const user = await User.findById(userId);
         if (!user) {
@@ -45,10 +57,7 @@ const borrowBookFromLibrary = async (req, res) => {
             });
         }
 
-        // Debugging: Log the inventory and book title
-        console.log("Library Inventory:", library.inventory);
-        console.log("Requested Book Title:", bookTitle);
-
+       
         // Normalize book titles to avoid case mismatches
         const normalizedBookTitle = bookTitle.toLowerCase();
 
@@ -119,6 +128,19 @@ const returnBorrowedBook = async (req, res) => {
     try {
         const language = req.headers['language'] === 'hi' ? 'hi' : 'en';
         const { id } = req.params; // Book ID passed in the request URL
+
+
+          // Validate bookId
+          if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({
+                success: false,
+                message: {
+                    en: "Invalid book ID",
+                    hi: "अमान्य पुस्तक आईडी"
+                }[language]
+            });
+        }
+
 
         // Find the book in the Book collection by its ID
         const book = await Book.findById(id);

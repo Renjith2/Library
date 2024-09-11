@@ -5,6 +5,7 @@ const Book = require('../models/BookSchema');
 const User = require('../models/UserSchema');
 const moment = require('moment');
 const Library = require('../models/LibrarySchema');
+const  mongoose  = require('mongoose');
 
 // Function to hash file buffer
 const hashFileBuffer = (buffer) => {
@@ -53,7 +54,7 @@ const addBook = async (req, res) => {
         // Check if title is already taken
         const existingBook = await Book.findOne({ title });
         if (existingBook) {
-            return res.status(400).json({
+            return res.status(409).json({
                 message: {
                     hi: "शीर्षक पहले से ही मौजूद है।",
                     en: "Title already exists."
@@ -92,7 +93,7 @@ const addBook = async (req, res) => {
         // Check if the file with the same hash already exists
         const [exists] = await fileRef.exists();
         if (exists) {
-            return res.status(400).json({
+            return res.status(409).json({
                 message: {
                     hi: "इस नाम से एक छवि पहले से ही मौजूद है।",
                     en: "An image with this file name already exists."
@@ -136,6 +137,7 @@ const addBook = async (req, res) => {
     }
 };
 
+// getting all the books present in the collection
 const getAllBooks = async (req, res) => {
     const language = req.headers['language'] === 'hi' ? 'hi' : 'en';
 
@@ -178,36 +180,52 @@ const updateBookById = async (req, res) => {
     const { id } = req.params;
     const language = req.headers['language'] === 'hi' ? 'hi' : 'en';
 
+      // Check if the ID is a valid ObjectId
+      if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({
+            success: false,
+            message: {
+                en: "Invalid book ID",
+                hi: "अमान्य पुस्तक आईडी"
+            }[language]
+        });
+    }
+
     try {
 
-         //  Check if the user is an author
-         const user = await User.findById(userId);
-         if (!user || !user.isAuthor) {
-             return res.status(403).json({
-                 message: {
-                     hi: "केवल लेखक ही किताबें जोड़ सकते हैं।",
-                     en: "Only authors are allowed to update books."
-                 }[language]
+         // Validate the book ID
+         const book = await Book.findById(id);
+        
+ 
+
+          // Check if the user is the author of the book
+          const author = await User.findById(userId);
+          if (!author || book.author !== author.name) {
+              return res.status(403).json({
+                  success: false,
+                  message: {
+                      hi: "केवल लेखक ही किताबें अपडेट कर सकते हैं।",
+                      en: "Only the author can update this book."
+                  }[language]
+              });
+          }
+
+           if (!book) {
+             return res.status(404).json({
+                 message: {hi: "किताब नहीं मिली।" ,
+                     en: "Book not found."}[language]
              });
          }
  
         const { title, publishedDate } = req.body;
         const file = req.file;
 
-        // Validate the book ID
-        const book = await Book.findById(id);
-        if (!book) {
-            return res.status(404).json({
-                message: {hi: "किताब नहीं मिली।" ,
-                    en: "Book not found."}[language]
-            });
-        }
-
+       
         // Step 1: Update the title if provided
         if (title) {
             const existingBook = await Book.findOne({ title, _id: { $ne: id } });
             if (existingBook) {
-                return res.status(400).json({
+                return res.status(409).json({
                     message: {hi:  "शीर्षक पहले से ही मौजूद है।",
                         en : "Title already exists."}[language],
                 });
@@ -268,6 +286,14 @@ const updateBookById = async (req, res) => {
 
         // Save the updated book to the database
         await book.save();
+
+
+        // Try to find the library that contains the book and update the title in its inventory, if exists
+        await Library.findOneAndUpdate(
+            { "inventory.bookid": id },
+            { $set: { "inventory.$.title": title } }, // Update only the title of the book in the inventory
+            { new: true }
+        );
         return res.status(200).json({
         message: {hi : "किताब सफलतापूर्वक अपडेट की गई!" ,
             en: "Book updated successfully!"}[language],
@@ -294,16 +320,16 @@ const deleteBookById = async (req, res) => {
     const language = req.headers['language'] === 'hi' ? 'hi' : 'en';
 
     try {
-          //  Check if the user is an author
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({
+                message: {
+                    hi: "अमान्य किताब आईडी।",
+                    en: "Invalid book ID."
+                }[language]
+            });}
+          
           const user = await User.findById(userId);
-          if (!user || !user.isAuthor) {
-              return res.status(403).json({
-                  message: {
-                      hi: "केवल लेखक ही किताबें जोड़ सकते हैं।",
-                      en: "Only authors are allowed to delete books."
-                  }[language]
-              });
-          }
+       
   
         // Step 1: Validate the book ID
         const book = await Book.findById(id);
@@ -313,6 +339,27 @@ const deleteBookById = async (req, res) => {
                     en : "Book not found."}[language],
             });
         }
+        
+     // Ensure the user is the author of the book
+     if (book.author !== user.name) {
+        return res.status(403).json({
+            message: {
+                hi: "आप केवल अपनी किताबों को हटा सकते हैं।",
+                en: "You can only delete your own books."
+            }[language]
+        });
+    }
+
+
+    // Step 5: Check if the book is in a library inventory and remove it from there
+    const library = await Library.findOne({ "inventory.bookid": id });
+    if (library) {
+        // Remove the book from the library's inventory
+        await Library.updateOne(
+            { _id: library._id },
+            { $pull: { inventory: { bookid: id } } }
+        );
+    }
 
         // Step 2: Check if the book has an associated image
         if (book.image) {
@@ -355,6 +402,17 @@ const getBookDetailsById = async (req, res) => {
     try {
         const language = req.headers['language'] === 'hi' ? 'hi' : 'en';
         const { id } = req.params;
+
+        // Check if the ID is a valid ObjectId
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({
+                success: false,
+                message: {
+                    en: "Invalid book ID",
+                    hi: "अमान्य पुस्तक आईडी"
+                }[language]
+            });
+        }
 
         // Find the book by its ID
         const book = await Book.findById(id);

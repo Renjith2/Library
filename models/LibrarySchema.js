@@ -13,6 +13,10 @@ const LibrarySchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    owner:{
+        type:String,
+        required:true
+    },
     inventory: [{
         bookid: {
             type: mongoose.Schema.Types.ObjectId, // Use ObjectId to reference books

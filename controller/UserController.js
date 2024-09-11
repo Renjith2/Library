@@ -43,7 +43,7 @@ const registerController = async (req, res) => {
         // Check if the email is already registered
         const existingUser = await User.findOne({ email });
         if (existingUser) {
-            return res.status(400).json({
+            return res.status(409).json({
                 message: {
                     en: "Email already registered.",
                     hi: "ईमेल पहले से पंजीकृत है।"
@@ -109,7 +109,7 @@ const loginController =async (req, res) => {
         // Check if the user exists
         const user = await User.findOne({ email });
         if (!user) {
-            return res.status(400).json({
+            return res.status(404).json({
                 message: {
                     en: "Invalid email.",
                     hi: "अमान्य ईमेल"
@@ -120,7 +120,7 @@ const loginController =async (req, res) => {
         // Check if the password is correct
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
-            return res.status(400).json({
+            return res.status(401).json({
                 message: {
                     en: "Invalid  password.",
                     hi: "अमान्य  पासवर्ड।"

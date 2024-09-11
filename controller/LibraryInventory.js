@@ -49,6 +49,18 @@ const addBookToLibraryInventory = async (req, res) => {
             });
         }
 
+         // Check if the book with the same title is already in the library's inventory
+         const bookExists = library.inventory.some(item => item.title === title);
+         if (bookExists) {
+             return res.status(400).json({
+                 success: false,
+                 message: {
+                     en: "Book with this title already exists in the library's inventory",
+                     hi: "इस शीर्षक के साथ पुस्तक पहले से ही लाइब्रेरी की इन्वेंट्री में मौजूद है"
+                 }[language]
+             });
+         }
+
                // Check if the book already belongs to another library
         if (book.libraryName) {
             return res.status(400).json({
@@ -60,17 +72,7 @@ const addBookToLibraryInventory = async (req, res) => {
             });
         }
 
-        // Check if the book with the same title is already in the library's inventory
-        const bookExists = library.inventory.some(item => item.title === title);
-        if (bookExists) {
-            return res.status(400).json({
-                success: false,
-                message: {
-                    en: "Book with this title already exists in the library's inventory",
-                    hi: "इस शीर्षक के साथ पुस्तक पहले से ही लाइब्रेरी की इन्वेंट्री में मौजूद है"
-                }[language]
-            });
-        }
+       
 
         // Add the book to the library's inventory
         const newInventoryItem = {
@@ -84,6 +86,7 @@ const addBookToLibraryInventory = async (req, res) => {
 
          // Update the book's library field
          book.libraryName = library.name;
+         book.libraryID=library._id
          await book.save();
 
         return res.status(200).json({
