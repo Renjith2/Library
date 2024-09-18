@@ -195,11 +195,19 @@ const updateBookById = async (req, res) => {
 
          // Validate the book ID
          const book = await Book.findById(id);
+
+         if (!book) {
+            return res.status(404).json({
+                message: {hi: "किताब नहीं मिली।" ,
+                    en: "Book not found."}[language]
+            });
+        }
         
  
 
           // Check if the user is the author of the book
           const author = await User.findById(userId);
+          console.log(author);
           if (!author || book.author !== author.name) {
               return res.status(403).json({
                   success: false,
@@ -210,12 +218,12 @@ const updateBookById = async (req, res) => {
               });
           }
 
-           if (!book) {
-             return res.status(404).json({
-                 message: {hi: "किताब नहीं मिली।" ,
-                     en: "Book not found."}[language]
-             });
-         }
+        //    if (!book) {
+        //      return res.status(404).json({
+        //          message: {hi: "किताब नहीं मिली।" ,
+        //              en: "Book not found."}[language]
+        //      });
+        //  }
  
         const { title, publishedDate } = req.body;
         const file = req.file;
