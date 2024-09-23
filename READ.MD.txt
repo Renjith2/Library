@@ -1,0 +1,41 @@
+This project is an  bookkeeping service where there are three models namely Books, Users and Libraries. A User can either be an Author or a Borrower, a Book is written by some User (Author), and is currently owned by a certain library and is currently borrowed by a certain user (Borrower).
+
+
+## Installation
+
+### Prerequisites
+- Node.js 
+
+
+### Setup
+
+
+- Clone the repository
+
+- Rootdirectory -> (Backend)
+
+- Install dependencies: npm i bcryptjs crypto dotenv express firebase firebase-admin jsonwebtoken moment mongoose multer nodemon
+
+- Configure environment variables: 
+   
+    *) Create a `.env` file in the root directory.
+    *) Add necessary environment variables.
+    *) All the details have given below.
+
+    MONGODB_URL='mongodb+srv://renjithkrishnan316:Renjith1995@cluster0.fssnc.mongodb.net/Bookstore?retryWrites=true&w=majority&appName=Cluster0'
+JWT_SECRET='bookstore'
+
+FIREBASE_PROJECT_ID='alpha-books-74e93'
+FIREBASE_PRIVATE_KEY_ID='0685766bc139ffd8672e843c459ad62b557c634d'
+FIREBASE_PRIVATE_KEY='-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCUaR3H5PuYDIp+\nf9KpSG6tVkv7yw8XyrAOlpuAdCv/l+T6GnJ+RqhwNhF2nKtuTx9Qow8yu6p6Gvyi\neWr2Ym9FS2KFXAtZcLi4kwPu4k6nEdNijMjteinjF15GMg+UCdXXaGGnqtk2Fl/b\ngsDAh5ZQzf5XrOLsLH2f7DQCH9MmAfDP8Xkbe35oWnbBODFG3ORQq0JfUsuMw5kO\nTtab3+DgMZoePrvAkElbwZLTOCBlnkb52HVfE1UXIqCzEm/FlGLTBrkkAUa/Q1Mq\nh3bp4N7dkJQJbrKu+cfuaZKUZ1LqxU14c17rSEfSEs9jgDBbnkK13D1EFTQ3WsN1\n1jeD17K7AgMBAAECggEAP3oiWcBP+D3M8sQ7V1p6tDsH7t9wSi3QVb0HL88Ajqbq\nMisjs20HWE9X8tKZ5GmFLFlCA+IOzYFDcz7ZiB6cFxhiQEYZOJ0k9RU0hnVXTNAs\nCKfMvP4WcmIpWX7J+Pin9SVZN3y0wRSa1Wm8hdy4Z0FkOx3gRUHWTZOavxnblxJw\nrvoIrKMfJiqm5LrnUzu8gIJX/TMrMbK2WmZvW9xKDrstGBZ/9h9sfO2D56wM/OLN\nODOQe520JonYWNAKNd+CuRxDHkVT7b0amgi76PnUZpCs+8cu6TcA0ksd6XOu4mFV\nO4aAOa6yPs3FrdWDIR5XSDklZtCw4kPBiRbNpMRC4QKBgQDDGCQ+hRusNnYEaUND\n4JzYiWy/WucQDaNY1vT3E36D9fAL7+8wbHaCrT+0w6SklOY3lqSZoBSOqkwSsODf\n+uXnwUN8bTLay7+vUgg3Vz+EBEG38xN8XwgJKHfa3XX4aiftgnmIsrhDyAALw/7t\nGcyKNprR9cODRqVqllBo9QUmSwKBgQDCvghk21QRtePHh8S+EoCZQrO53RNVPQrT\nMD9q9azT3BkirUvO+mw4kFUqBnr0ycoF9A8ccNg4AcQNheliqJLEPDrkbp32Jbd0\nw99MRRrTes070AhahR2uuWomNzTuyku2n21lTVAYqmhaEgTIopXjbyHgyjjjrqU4\ndmInsoqfUQKBgQCVECsRQe7k5C/EKxFkGYh9wnK+upv1nhYC2SsOZWyzMwSYelkN\nbLIYInuciCeSQNqt+oIFh1RttRyu40rOmAt1yirgNSc4GZl6QXlZn2Y+XmpAPI/U\n5V9kb/Ez3yY2ChY72Qc3NSapU3UFiFmNm7q2mAYvClK6SQ42pGcH6r5mhQKBgBja\nf9+/Th9kg0l3vlgzrE3jAWT7HfiG7da+FZnk+MWhFWQjkcU8mIsvgG74nMCY8DuK\nRlNu42licE75hCufL/vzY+C7bVV4ws0YImttdlr/FSpJBofm7T7bUvzFlu/SyY7p\nEeEX2N0NAnxcSFgCx/ZavIwfwtrr8xIdqbE/TAnBAoGAEWJhIlNiXMuu0vgtyjAU\nJYINSZCQBxYKZsYk7pkA84W99bWIObWJ1jR8cnbJUax43GH1wctiDpR41fdqtM+f\n9Q3TVnwFsrPbxxA6q0V9JiamYH0Pf2/oDDp0n0COT43Qg/jrb3qUIFYNm1+6Rya5\nh6kCtH+rSk/0ToN2EMym+T0=\n-----END PRIVATE KEY-----\n'
+FIREBASE_CLIENT_EMAIL='firebase-adminsdk-lmro2@alpha-books-74e93.iam.gserviceaccount.com'
+FIREBASE_CLIENT_ID='117154826337017483329'
+
+
+- Start the development server: npx nodemon Server.js
+
+
+## Usage   
+
+- The user can access all the apis , since it have been hosted on render.
+- Server deployed Link - https://library-1fa7.onrender.com/
